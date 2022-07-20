@@ -680,3 +680,530 @@ print (Tomas.nombre)                        #Volvemos a imprimir
 Tomas.peso = 28
 del Tomas.nombre                            #Borramos el nombre utilizando deleter
 ```
+
+# Encapsulamiento, getters y setters
+
+**Un Decorator:** Usar ropa es un ejemplo del uso de decoradores en la vida real. Cuando tienes frío, te envuelves en un suéter. Si todavía tienes frío con un suéter, puedes usar una chaqueta en la parte superior. Si está lloviendo, puedes ponerte un impermeable. Todas estas prendas “amplían” tu comportamiento básico, pero no son parte de ti, y pueden quitarse fácilmente cuando no las necesites.
+
+**Un Decorator en código:** No es más que un objeto que agrega nuevas funcionalidades al objeto original.
+
+El encapsulamiento permite:
+
+- Permite agrupar datos y su comportamiento.
+- Controla el acceso a dichos datos.
+- Previene modificaciones no autorizadas.
+
+En la definición de la clase el atributo región es privado y está inicializado en None. Al ser privado no debería poder accederse a su valor desde fuera de la clase directamente, sino que debería hacerse mediante un método que retorne su valor. De la misma manera no debería poder modificarse su valor desde fuera, así que es necesario un método para eso.
+
+```python
+#Encapsulamiento, getters y setters
+class CasillaDeVotacion:
+    
+    def __init__(self, identificador, pais):
+        self.__identificador = identificador
+        self.__pais = pais
+        self.__region = None
+
+    @property
+    def region(self):
+        return self.__region
+
+    @region.setter
+    def region(self, region):
+        if region in self.__pais:
+            self.__region = region
+        else:
+            raise ValueError(f'La region {region} no es valida en {self.__pais}')
+
+casilla = CasillaDeVotacion(123,['Guatemala','Zacapa'])
+print(casilla.region)
+casilla.region = 'Guatemala'
+print(casilla.region)
+```
+
+El decorador @property otorga funcionalidades al método región. En ese momento región puede ser:
+
+- **getter:** un método que retorne el valor del atributo.
+- **setter:** un método que asigne un valor al atributo.
+
+Por eso podemos hacer @region.metodo, en este caso @region.setter y definir un método que me permita controlar que valor va a ser asignado a ese atributo. Si el valor no es el correcto, con raise indicando un error.
+
+# Herencia
+
+- Permite modelar una jerarquía de clases.
+- Permite compartir comportamiento común en la jerarquí.
+- Al padre se le conoce como superclase y al hijo como subclase.
+
+Un aspecto importante de la herencia es la posibilidad de reutilizar código. La reutilización es uno de los pilares de POO, de manera que evitamos reinventar la rueda cada vez. Si tenemos un comportamiento que es común entre una serie de objetos de la misma categoría, este comportamiento debe enviarse a una clase superior que permita compartirlo con sus clases hijas. Esto facilita la mantenibilidad del código haciéndolo más estable. 
+
+```python
+#Herencia
+
+class Rectangulo:
+    def __init__(self, base, altura):
+        self.base = base
+        self.altura = altura
+    def area(self):
+        return self.base*self.altura
+
+# En python para heredar una clase se utiliza de la siguiente manera
+class Cuadrado(Rectangulo):
+    def __init__(self, lado):
+        super().__init__(lado, lado)
+
+if __name__ == "__main__":
+    rectangulo = Rectangulo(base=3, altura=4)
+    print(rectangulo.area())
+#lo interesante de las herencias es que pueden utilizar métodos de la clase padre
+    cuadrado = Cuadrado(lado=5)
+    print(cuadrado.area())
+```
+
+Output[]: 12
+               25
+
+# Polimorfismo
+
+El polimorfismo es una forma de herencia en la que la implementación base se altera, entonces el polimorfismo sería una herencia editada. 
+
+- La habilidad de tomar varias formas.
+- En python, nos permite cambiar el comportamiento de una superclase para adaptarlo a la subclase.
+
+```python
+class Persona:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self._action = 'Ando caminando'
+
+    def avanza(self):
+        print(f'{self._action}')
+
+class Ciclista(Persona):
+
+    def __init__(self, nombre):
+        super().__init__(nombre)
+        self._action = 'Ando moviendome en mi bicicleta'
+
+    def avanza(self):
+        super().avanza()
+
+def main():
+    persona = Persona('David')
+    persona.avanza()
+
+    ciclista = Ciclista('Daniel')
+    ciclista.avanza()
+
+if __name__ == '__main__':
+    main()
+```
+
+# Introducción a la complejidad algorítmica
+
+- ¿Por qué comparamos la eficiencia de un algoritmo?
+- Complejidad temporal vs complejidad espacial.
+- Podemos definirlo como T(n)
+
+Es importante tener el control de cuánto tiempo, espacio de memoria y poder de cómputo se necesita para poder ejecutar ciertos algoritmos. Algunos pueden ayudarnos a optimizar mejor el tiempo.
+
+La función T(n) determina el tiempo que tarda un algoritmo en ejecutarse. Esta función nos ayuda a 
+
+- Cronometrar el tiempo en el que corre un algoritmo.
+- Contar los pasos con una medida abstracta de operación.
+- Contar los pasos conforme nos aproximamos al infinito.
+
+```python
+# Complejidad algoritmica en Python 
+import time
+
+#Implementación factorial 
+
+def factorial(n):
+    respuesta = 1
+    while n>1:
+        respuesta *= n
+        n -= 1
+    return respuesta
+
+def factorial_r(n):
+    if n == 1: 
+        return 1
+    return  n*factorial_r(n-1)
+
+if __name__ == "__main__":
+    n = 300000
+    comienzo = time.time()
+    factorial(n)
+    #print(n,'!=',factorial(n))
+    final = time.time()
+    print('t=',final-comienzo)
+
+    comienzo = time.time()
+    #print(n,'!=',factorial_r(n))
+    factorial_r(n)
+    final = time.time()
+    print('t_r=',final-comienzo)
+```
+
+El código ejecuta el factorial de un número n de forma norma y de forma recursiva para determinar el tiempo empleado de ejecución de cada manera. El tiempo tiende a tener un comporamiento cuadrático, por lo que a mayor número, el tiempo crece de forma grotesca.
+
+## Conteo abstracto de operación
+
+Existe una función que nos ayuda a conocer el comportamiento de cada uno de nuestros algoritmos. Por ejemplo, el siguiente código ejecuta algoritmo del tipo lineal y cuadrático. Para medir la complejidad, se utiliza la Big O Notation.
+
+```python
+#Conteo abstrarcto de operación
+def f(x):
+    respuesta = 0
+    #Loop independiente 
+    for i in range(1000):
+        respuesta += 1
+    #Loop dependiente
+    for i in range(x):
+        respuesta += x
+    #Doble loop 2*x*x=2x^2 
+    for i in range(x):
+        for j in range(x):
+            respuesta += 1
+            respuesta += 1
+    #respuesta = 1002 + x + 2x^2
+    return respuesta
+```
+
+Esta función polinomial es del tipo $O(n^2)$.
+
+## Notación asintótica
+
+- No importa varicaciones pequeñas
+- El enfoque se centra en lo que pasa conforme el tamaño del problema se acerca al infinito.
+- Mejor de los casos, promedio, peor de los casos.
+- Big O
+- Nada más importa el término de mayor tamaño
+
+- Un loop
+    - crecimiento lineal.
+- Un lopp dentro de otro.
+    - Crecimiento cuadratico.
+- Llamadas recursivas
+    - Crecimiento exponencial.
+    
+
+```python
+# Ley de la suma
+
+def f(n):
+    for i in range(n):
+        print(i)
+    for i in range(n):
+        print(i)
+
+#O(n) + O(n) = O(n+n) = 0(2n) = 0(n)
+```
+
+Este ejemplo es uno lineal, y la suma de dos funciones lineales da como resultado un lineal.
+
+```python
+# Ley de la suma 
+
+def f(n):
+    for i in range(n):
+        print(i)
+    for i in range(n*n):
+        print(i)
+
+# O(n) + O(n*n) = O(n+n^2) = O(n^2)
+```
+
+El comportamiento del primer for es lineal, pero el segundo es cuadrático. La función de estas dos funciones es cuadrático dado que nos importa de manera asintótica el comportamiento de la función cuadrática.
+
+```python
+# Ley de la multiplicación
+
+def f(n):
+    for i in range(n):
+        for j in range(n):
+            print(i,j)
+    
+f(10)
+# O(n) * O(n) = O(n*n) = O(n^2)
+```
+
+Una iteración dentro de una iteración, la complejidad se multiplica.  Un loop dentro de un loop es complejidad cuadrática.
+
+```python
+#Recursividad múltiple
+def fibonacci(n):
+    if n == 0 or n ==1:
+        return 1
+    return fibonacci(n-1)+fibonacci(n-2)
+
+# Algoritmo del tipo O(2^n)
+```
+
+Un fibonacci recursivo. Por cada llamada de fibonacci regresamos dos números. Entre más crece, llamamos más y más funciones de la forma 2**n. Si se llamara 3 veces sería 3**n, etc. 
+
+## Clases de complejidad algorítmica
+
+- O(1) constante.
+    - No importa la cantidad de input que reciba, siempre demora el mismo tiempo.
+- $O(n)$ lineal.
+    - La complejidad crecerá de forma proporcional a medida que crezca el input.
+- $O(\log n)$ logarítmico.
+    - Nuestra función crecerá de forma logarítmica con respecto al input. Esto significa que en un inicio crecerá rápido, pero luego se estabiliza.
+- $O(n \log n)$ log lineal.
+    - Crecerá de forma logarítmica pero junto con una constante.
+- $O(n^2$) polinomial.
+    - Crecerá de forma cuadrática. No son recomendables a menos que el input de datos en pequeño.
+- $O(2^n)$ exponencial.
+    - Crecerá de forma exponencial por lo que la carga es muy alta. Para nada recomendables en ningún caso, solo análisis conceptual.
+- $O(n!)$ Factorial
+    - Crece de forma factorial, por lo que al igual que el exponencial su carga es muy alta, por lo que jamás utilizar este tipo de algoritmos.
+    
+    ![Untitled](POO%20Python%20f1fa7c98eec648518166ee64b7cb1c8c/Untitled.png)
+    
+
+# Búsqueda Lineal
+
+- Buscar en todos los elementos de manera secuencial.
+- ¿Cuál es el peor caso?
+
+```python
+import random
+
+def busqueda_lineal(lista, objetivo):
+    match = False
+
+    for elemento in lista: # O(n)
+        if elemento == objetivo:
+            match = True
+            break
+
+    return match
+
+if __name__ == '__main__':
+    tamano_de_lista = int(input('De que tamano sera la lista? '))
+    objetivo = int(input('Que numero quieres encontrar? '))
+
+    lista = [random.randint(0, 100) for i in range(tamano_de_lista)]
+
+    encontrado = busqueda_lineal(lista, objetivo)
+    print(lista)
+    print(f'El elemento {objetivo} {"esta" if encontrado else "no esta"} en la lista')
+```
+
+Mejor caso: cuando el elemento se encuentra en la primera posición requiere decir que solo realiza 1 iteración el bucle for por lo tanto su complejidad es O(1) 
+
+Peor caso: Cuando el elemento se encuentra en la última posicioń o no se encuentra dentro del array, la complejidad sería O(n).
+
+# Busqueda binaria
+
+- Divide y conquista.
+- El problema se divide en 2 en cada iteración.
+- ¿Cuál es el peor caso?
+
+- Si tu lista está ordenada:
+    - Usar algoritmo de buśqueda binaria.
+- Si se utilizará muchas veces tu lista:
+    - Lo mejor es ordenarla y utilizar algoritmo de busqueda binaria.
+- Si tu lista no está ordenada y se va a utilizar solo una vez:S
+    - Utilizar algoritmo de busqueda lineal.
+    
+
+```python
+import random 
+
+def busqueda_binaria(lista, comienzo, final, objetivo):
+    print(f'Buscando {objetivo} entre {lista[comienzo]} y {lista[final-1]}')
+    if comienzo > final:
+        return False
+    medio = (comienzo + final)//2 #División de enteros
+
+    if lista[medio] == objetivo:
+        return True
+    elif lista[medio] < objetivo:
+        return busqueda_binaria(lista, medio+1 , final, objetivo)
+    else:
+        return busqueda_binaria(lista, comienzo, medio - 1, objetivo)
+
+if __name__ == '__main__':
+    tamano_de_lista = int(input('De que tamano es la lista? '))
+    objetivo = int(input('Que numero quieres encontrar? '))
+
+    lista = sorted([random.randint(0, 100) for i in range(tamano_de_lista)])
+
+    encontrado = busqueda_binaria(lista, 0, len(lista), objetivo)
+
+    print(lista)
+    print(f'El elemento {objetivo} {"esta" if encontrado else "no esta"} en la lista')
+```
+
+La búsqueda binaria toma dos valores, de comienzo y final. 
+
+Si el comienzo es mayor que el final, entonces regresa False, porque se pasó.
+
+La lista se divide en dos,  comienzo+final/2 sin residuos. 
+
+Si la lista con el índice medio es igual al objetivo, lo encontramos. Sino, la lista en el medio es menor al objetivo, se realiza otra busqueda binaria. Comienza en medio+1 (el lugar donde estabamos nos corremos una casilla) y el final sigue siendo el mismo.
+
+Si el elemento es mayor,  se hace otra búsqueda y se va una casilla hacia atrás. 
+
+# Ordenamiento de burbuja
+
+El ordenamiento de burbuja es un algoritmo que recorre repetidamente una lista que necesita ordenarse. Repetidamente una lista que necesita ordenarse. Compara elementos adyacentes y los intercambia si estan en el orden incorrecto. Este procedimiento se repite hasta que no se requieren más intercambios, lo que indica que la lista se encuentra ordenada.
+
+Bubble Sort da una garantía que el elemento más grande se encuentra siempre hasta el final. Si lo único que se requiere es el valor más alto, se usa el ordenamiento una sola vez O(n) para obtenerlo. 
+
+```python
+import random 
+
+def ordenamiento_de_burbuja(lista):
+    n = len(lista)
+
+    for i in range(n):
+        for j in range(0,n-i-1):
+            if lista[j] > lista[j+1]:
+                lista[j], lista[j+1] = lista[j+1], lista[j]
+                print(lista)
+    return lista
+
+if __name__ == '__main__':
+    tamano_de_lista = int(input('De que tamano es la lista? '))
+
+    lista = [random.randint(0, 100) for i in range(tamano_de_lista)]
+    print(lista)
+
+    lista_ordenada = ordenamiento_de_burbuja(lista)
+    print(lista_ordenada)
+```
+
+Las limitaciones de este problema es que tiene complejidad O(n^2). Esto limita a la hora de querer ordenar una lista gigantesca. 
+
+# Ordenamiento por inserción
+
+El ordenamiento por inserción es uno de los algoritmos más comunes que estudian los científicos de cómputo. Es intuitivo y fácil de implementar, pero es muy ineficiente para listas de gran tamaño.
+
+Una de las características del ordenamiento por inserción es que ordena en “su lugar”. Es decir que no requiere memoria adicional para realizar el ordenamiento ya que simplemente modifican los valores de memoria.
+
+La definición más simple:
+
+Una lista es dividida entre una sublista ordenada y otra sublista desordenada. Al principio la sublista ordenada contiene un solo elemento, por lo que por definición se encuentra ordenada.
+
+A continuación se evalua el primer elemento dentro la sublista desordenada para que podamos insertarlo en el lugar dentro de la lista ordenada. 
+
+A continuación se evalua el primer elemento dentro la sublista desordenada para que podamos insertarlo en el lugar correcto dentro de la lista ordenada. 
+
+La inserción se realiza al mover todos los elementos mayores al elemento que se está evaluando un lugar a la derecha.
+
+# Ordenamiento por mezcla
+
+El ordenamiento por mezcla es un algoritmo de divide y conquista. Primero divide una lista en partes iguales hasta que quedan sublistas de 1 a 0 elementos. Luego las recombina en forma ordenada. Merge Sort.
+
+```python
+import random
+
+def ordenamiento_por_mezcla(lista):
+    if len(lista) > 1:
+        medio = len(lista) // 2
+        izquierda = lista[:medio]
+        derecha = lista[medio:]
+        print(izquierda, '*' * 5, derecha)
+
+        # llamada recursiva en cada mitad
+        ordenamiento_por_mezcla(izquierda)
+        ordenamiento_por_mezcla(derecha)
+
+        # Iteradores para recorrer las dos sublistas
+        i = 0
+        j = 0
+        # Iterador para la lista principal
+        k = 0
+
+        while i < len(izquierda) and j < len(derecha):
+            if izquierda[i] < derecha[j]:
+                lista[k] = izquierda[i]
+                i += 1
+            else:
+                lista[k] = derecha[j]
+                j += 1
+
+            k += 1
+
+        while i < len(izquierda):
+            lista[k] = izquierda[i]
+            i += 1
+            k +=1
+
+        while j < len(derecha):
+            lista[k] = derecha[j]
+            j += 1
+            k += 1
+        
+        print(f'izquierda {izquierda}, derecha {derecha}')
+        print(lista)
+        print('-' * 50)
+
+    return lista
+
+if __name__ == '__main__':
+    tamano_de_lista = int(input('De que tamano sera la lista? '))
+
+    lista = [random.randint(0, 100) for i in range(tamano_de_lista)]
+    print(lista)
+    print('-' * 20)
+
+    lista_ordenada = ordenamiento_por_mezcla(lista)
+    print(lista_ordenada)
+```
+
+# Ambientes Virtuales
+
+- Permiten aislar el ambiente para poder instalar diversas versiones de paquetes.
+- A partir de Python 3 se incluye en la librería estándar en el módulo venv.
+- Ningún ingeniero profesional de Python trabaja sin ellos.
+
+# ¿Por qué graficar?
+
+- Reconocimiento de patrones
+- Predicción de una serie
+- Simplifica la interpretación y las conclusiones acerca de los datos.
+
+> No siempre debemos buscar patrones donde no los hay.
+> 
+
+## Graficado simple
+
+- Bokeh permite construir gráficas complejas de manera rápida y con comandos simples.
+- Permite Exportar a varios formatos como html, notebooks, imágenes, etc.
+- Bokeh se puede utilizar en el servidor de Flask y Django.
+
+```python
+from bokeh.plotting import figure, output_file, show
+
+if __name__ == "__main__":
+    output_file = ('graficado_simple.html')
+    fig = figure()
+
+    total_vals = int(input('Cuántos valores quiere graficar?'))
+    x_vals = list(range(total_vals))
+    y_vals = []
+    for i in x_vals:
+        val = int(input(f'valor Y para {i}'))
+        y_vals.append(val)
+
+    fig.line(x_vals, y_vals, line_width = 2)
+    show(fig)
+```
+
+# Introducción a la optimización
+
+- El concepto de optimización permite resolver muchos problemas de manera computacional.
+- Una función objetiva que debemos maximizar o minimizar.
+- Una serie de limitantes que debemos respetar.
+
+Problema P vs Np: 
+
+No todos los problemas pueden ser resueltos de manera eficiente.
+
+# El problema del morral
+
+Imagina que eres un ladrón que quiere entrar a un museo pero te topas con un problema: solamente hay una mochila para cargar las cosas y debes elegir que objetos llevarte de mayor valor.
